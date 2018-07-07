@@ -161,5 +161,26 @@ The notes of studying in BingYan summer camp.
         * WakeUp（唤醒）  
             `public void WakeUp();`  
 
-
-
+#### Collider组件  
+##### 响应函数  
+OnCollisionEnter OnCollisionEnter OnCollisionExit  
+都有(Collision collion)参数   
+>**Collision**  
+>成员变量：  
+>relativeVelocity：与碰撞物体的相对线性速度  
+>rigidbody：碰撞物体的rigidbody组件  
+>collider:碰撞物体的collider组件  
+>transform:碰撞物体的transform组件  
+>gameObject:碰撞的物体   
+>contacts:与碰撞物体的接触的点集，ContactPoint\[]类型，contacts\[0]为接触的第一个点  
+>impulse:应用在接触解决的碰撞的总推力  
+##### 与子弹间的碰撞处理  
+* 碰撞消除（一般）  
+`Physics.IgnoreCollision(clone.collider,this.collider);`  
+* 碰撞效果  
+用射线函数判断是否被击中，并获取子弹击中点  
+`if (Physics.Raycast (originPosition, direction, hitInfo, distance)){.....}`  
+对该点施加子弹冲击力（先判断是否是刚体）  
+`if (hit.rigidbody) hit.rigidbody.AddForceAtPosition(force * direction, hitInfo.point);`  
+##### 复合碰撞器  
+由基本的碰撞器构成，创建在对应游戏对象的子空游戏对象中（便于单个调整）  
