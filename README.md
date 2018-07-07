@@ -1,5 +1,7 @@
 # CampStudyNotes
 The notes of studying in BingYan summer camp.
+
+-----------------------------------
 ## A summary of the Markdown grammar
 
 ### 标题  
@@ -66,6 +68,98 @@ The notes of studying in BingYan summer camp.
 * 格式化链接同文本  
 * \`URL链接\`  
 禁用系统自动转义的URL链接  
+--------------------------------  
+## A summary of Rigidbody Component
+
+### 物理引擎  
+#### Rigidbody组件  
+##### 功能  
+给游戏对象以物理属性
+##### 基本属性  
+* Mass  
+质量，默认值为1  
+* Drag  
+前进阻力，默认值为0  
+* Angular Drag  
+旋转阻力，默认值为0.05  
+* Use Gravity  
+是否使用重力，bool型，默认false  
+* Is Kinematic  
+是否遵循运动学（是否动态），bool型，默认false，可以受到物理约束，true，只受脚本和动画的影响，不受物理引擎约束，但不等于没有Rigidbody组件，通常用于需要用动画控制的刚体，使不会因为惯性而影响动画  
+* Interpolate  
+插值方式（平滑方式），默认None（无差值）：不使用差值平滑；Interpolate（差值）：根据上一帧来平滑移动；Extrapolate（推算）：根据推算下一帧物体的位置来平滑移动。  
+* Collision Detection  
+碰撞检测模式Discrete（离散）：默认的碰撞检测方式，适用于速度较慢的物体，速度较快时会穿过而不触发碰撞；Continuous（连续）：适用于速度较快物体，可以与有静态网格碰撞器的游戏对象进行碰撞检测；Continuous Dynamic（动态连续）：适用于速度较快物体，可以与所有设置了2或3方式的游戏对象进行碰撞检测。    
+* Freeze Position/Rotation  
+冻结位置/旋转  
+##### 刚体变量  
+* 声明  
+    * 对其它游戏对象的刚体组件进行操作时  
+    `public Rigidbody \_rig;`						
+    引用一个游戏对象的刚体组件，在检视面板中可在该脚本所挂载的游戏对象中的脚本中对其赋值  
+    安全代码：  
+    ` 
+    if（_rig==null）   
+    {   
+        Debug.LogError(“The \_rig is null”);    
+       return；    
+    }  `   
+    当刚体组件的引用未赋值时报错    
+    * 对自身的刚体组件进行操作时  
+    `private Rigidbody _rig=GetComponent<Rigidbody>();`
+    声明一个自身刚体组件的引用  
+* 成员变量  
+    * angularVelocity（角速度）  
+    角速度的向量，Vector3类型，方向为刚体旋转轴方向（世界坐标轴）  
+    示例代码：`GetComponent<Rigidbody>().angularVelocity=Vector3.up;  `
+    注：不建议过多修改，否则会造成模拟不真实  
+    * velocity（位移速度）  
+    物体位移速度值  
+    示例代码：`GetComponent<Rigidbody>().velocity=Vector3.up;`  
+    注：不建议过多修改，否则会造成模拟不真实  
+    * centerOfMass（重心）  
+    Vector3类型，通过调低物体重心可使其不易因其它物体的碰撞或作用力而倒下，若不对其进行设置，则Unity会自动根据collider对其进行计算  
+    * detectCollisions（碰撞检测）  
+    Bool类型，置为false时即为关闭碰撞检测，不会与任何“物体”发生碰撞  
+* 成员方法  
+    * 添加力  
+        * AddForce（施加力）  
+        Vector3类型，为施加力的向量  
+	    定义：  
+	    `public void AddForce(Vector3 force, ForceMode mode = ForceMode.Force)；`  
+        force 决定力的方向和大小  
+        mode 决定作用力的模式  
+        * AddTorque（施加力矩）  
+        定义：  
+        `public void AddTorque(Vector3 torque, ForceMode mode = ForceMode.Force);`  
+        torque 决定旋转力的大小和旋转轴的方向，旋转方向参照左手定则   
+        mode 决定作用力的模式  
+        * AddRelativeForce（施加相对力）  
+        * AddRelativeTorque（施加相对力矩）  
+        * AddExplosionForce（施加爆炸力）  
+    > ForceMode介绍  
+    > 功能：力的作用方式。枚举类型,有四个枚举成员  
+    > 计算公式：    Ft = mv(t) 即 v(t) = Ft/m    
+    >F—力的大小	t—间隔时间 	   m—物体质量	   v—物体速度 	 v(t)—v关于t的函数  
+    >ForceMode.Force : 持续施加一个力，与重力mass有关，t = 每帧间隔时间，m = mass，可叠加，可被其它力抵消，如重力  
+    >ForceMode.Impulse : 瞬间施加一个力，与重力mass有关，t = 1.0f，m = mass  
+    >ForceMode.Acceleration：持续施加一个力，与重力mass无关，t = 每帧间隔时间，m = 1.0f  
+    >ForceMode.VelocityChange：瞬间施加一个力，与重力mass无关，t = 1.0f，m = 1.0f，只改变速度  
+   
+    * ClosestPointOnBounds（计算相对刚体的最近点）  
+        `public Vector3 ClosestPointOnBounds(Vector3 position);`  
+    * 获取速度  
+        * GetPointVelocity（获取点坐标系的速度）  
+            `public Vector3 GetPointVelocity(Vector3 worldPoint);`  
+        * GetRelativePointVelocity（获取基于相对点坐标系的速度）  
+            `public Vector3 GetRelativePointVelocity(Vector3 relativePoint);`  
+    * 休眠  
+        * IsSleeping（是否处于休眠）  
+            `public bool IsSleeping();`  
+        * Sleep（强制休眠）  
+            `public void Sleep();`  
+        * WakeUp（唤醒）  
+            `public void WakeUp();`  
 
 
 
